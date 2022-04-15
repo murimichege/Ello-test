@@ -1,25 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  HttpLink,
+  from,
+} from "@apollo/client";
+import { onError } from "@apollo/client/link/error";
+import GetBooks from "./components/GetBooks";
+
+const errorLink = onError(({ graphqlErrors, networkError }) => {
+  if (graphqlErrors) {
+    graphqlErrors.map((message, location, pathname) => {
+      return(
+        alert(`Graphql error message is ${message}`)
+      )
+    
+    });
+  }
+});
+const httpLink = new HttpLink({ uri:'https://fullstack-engineer-test-n4ouilzfna-uc.a.run.app/graphql'});
+
+
+const link = from([
+  errorLink,
+  httpLink
+]);
+
+const client = new ApolloClient({
+  cache: new InMemoryCache(),
+  link: link,
+});
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  return <ApolloProvider client={client}>
+    {""}
+    <GetBooks/>
+
+  </ApolloProvider>
 }
 
 export default App;
